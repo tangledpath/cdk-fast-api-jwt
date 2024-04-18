@@ -7,8 +7,7 @@ from aws_cdk import (
     aws_ecs_patterns as ecs_patterns,
     aws_lambda as _lambda,
     aws_lambda_event_sources as lambda_event_sources,
-    CfnOutput, Duration, RemovalPolicy, Stack,
-)
+    CfnOutput, Duration, RemovalPolicy, Stack, )
 from aws_cdk.aws_ecr_assets import Platform
 from aws_cdk.aws_ecs_patterns import ApplicationLoadBalancedFargateService
 from aws_cdk.aws_lambda import DockerImageFunction, Function

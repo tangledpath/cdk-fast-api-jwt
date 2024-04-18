@@ -7,6 +7,7 @@ from dotenv import dotenv_values
 
 from cdk_fast_api_jwt.cdk_fast_api_jwt_stack import CdkFastApiJwtStack, StackConfig
 
+
 class MultistackApp:
     # Name for our production stack.  Staging/dev/other stacks will prepend a prefix:
     STACK_NAME_BASE = "CdkFastApiJwtStack"
@@ -37,12 +38,12 @@ class MultistackApp:
             Called to create the stacks for this app.  The CDK CLI will allow
             the user to create one, several, or all stacks available:
         """
-        self.__create_stack(environment='production', stack_env={})
-        self.__create_stack(environment='staging', stack_env={})
-        self.__create_stack(environment='test', stack_env={})
+        stack_env = dict()
+        self.__create_stack(environment='production', stack_env=stack_env)
+        self.__create_stack(environment='staging', stack_env=stack_env)
+        self.__create_stack(environment='test', stack_env=stack_env)
 
-
-    def __create_stack(self, environment: str, stack_env:Dict[str, Any]):
+    def __create_stack(self, environment: str, stack_env: Dict[str, Any]):
         """
         Create a specific stack based on given environment name @public
         :param environment: will be used as a prefix (delimited by a dash)
@@ -55,8 +56,8 @@ class MultistackApp:
 
         :param stack_env: Environment variables to be used when building the stack
              on AWS.  This is useful if you want to deploy with a different account
-             and/or to a different region.  Example keys: `AWS_ACCESS_KEY_ID`,
-             `AWS_DEFAULT_REGION`, and `AWS_SECRET_ACCESS_KEY`.
+             and/or to a different region.  Example keys: `account`,
+             `region`.
         """
         stack_config = copy.deepcopy(self.STACK_CONFIG_BASE)
         if environment == 'production':
