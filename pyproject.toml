@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "cdk-fast-api-jwt"
+version = "0.1.0"
+description = ""
+authors = ["Steven Miers <steven.miers@gmail.com>"]
+license = "The Unlicense"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aws-cdk-lib = "^2.137.0"
+constructs = "^10.3.0"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.1.0"
+pdoc = "^14.4.0"
+pytest = "^8.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.autopep8]
+max_line_length = 100
+ignore = "E501,W6"  # or ["E501", "W6"]
+in-place = true
+recursive = true
+aggressive = 3
