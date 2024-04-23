@@ -1,6 +1,6 @@
 #!/usr/bin/service_env python3
 import copy
-from typing import Dict, Any
+from typing import Dict, Any, Sequence
 
 import aws_cdk as cdk
 from dotenv import dotenv_values
@@ -24,7 +24,7 @@ class MultistackApp:
     STACK_CONFIG_BASE = StackConfig(
         service_env=dotenv_values(".env"),
         fargate_service_name="tapestryworlds-service",
-        lambda_fn_name="lambda-command-lambda_fn",
+        lambda_fn_name="lambda-command-fn",
         sqs_queue_name="tapestryworlds-sqs-sqs_queue.fifo",
         s3_bucket_name="tapestryworlds-s3-images-bucket",
     )
@@ -33,15 +33,23 @@ class MultistackApp:
         """ Constructor for our multistack app """
         self.cdk_app = cdk.App()
 
-    def create_stacks(self):
+    def create_stacks(self, environments: Sequence[str] = ['production', 'staging', 'test']):
         """
             Called to create the stacks for this app.  The CDK CLI will allow
             the user to create one, several, or all stacks available:
+
+            :param environments: List of environments to create; default is ['production', 'staging', 'test']
         """
         stack_env = dict()
-        self.__create_stack(environment='production', stack_env=stack_env)
-        self.__create_stack(environment='staging', stack_env=stack_env)
-        self.__create_stack(environment='test', stack_env=stack_env)
+        stacks = {}
+        if 'production' in environments:
+            stacks['production'] = self.__create_stack(environment='production', stack_env=stack_env)
+        elif 'staging' in environments:
+            stacks['staging'] = self.__create_stack(environment='staging', stack_env=stack_env)
+        elif 'test' in environments:
+            stacks['test'] = self.__create_stack(environment='test', stack_env=stack_env)
+
+        return stacks
 
     def __create_stack(self, environment: str, stack_env: Dict[str, Any]):
         """
@@ -64,13 +72,15 @@ class MultistackApp:
             stack_name = self.STACK_NAME_BASE
         else:
             stack_name = f"{environment.capitalize()}{self.STACK_NAME_BASE}"
-            stack_config.service_env.APP_ENV = environment
             stack_config.fargate_service_name = f"{environment}-{stack_config.fargate_service_name}"
             stack_config.lambda_fn_name = f"{environment}-{stack_config.lambda_fn_name}"
             stack_config.sqs_queue_name = f"{environment}-{stack_config.sqs_queue_name}"
             stack_config.s3_bucket_name = f"{environment}-{stack_config.s3_bucket_name}"
+            stack_config.service_env.APP_ENV = environment
+            stack_config.service_env.S3_BUCKET_NAME = stack_config.s3_bucket_name
+            stack_config.service_env.SQS_QUEUE_NAME = stack_config.sqs_queue_name
 
-        CdkFastApiJwtStack(
+        return CdkFastApiJwtStack(
             scope=self.cdk_app,
             construct_id=stack_name,
             stack_config=stack_config,
@@ -79,7 +89,8 @@ class MultistackApp:
         )
 
 
-# Create instance of our app; then create the stacks:
-app = MultistackApp()
-app.create_stacks()
-app.cdk_app.synth()
+if __name__ == "__main__":
+    # Create instance of our app; then create the stacks:
+    app = MultistackApp()
+    app.create_stacks()
+    app.cdk_app.synth()

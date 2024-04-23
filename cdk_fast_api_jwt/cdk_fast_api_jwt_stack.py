@@ -138,7 +138,7 @@ class CdkFastApiJwtStack(Stack):
             id=self.config.sqs_queue_name,
             queue_name=self.config.sqs_queue_name,
             fifo=True,
-            visibility_timeout=Duration.seconds(300),
+            visibility_timeout=Duration.seconds(360),
         )
         return queue
 
